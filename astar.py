@@ -181,7 +181,16 @@ def main():
 
 
 
- 
+    print '-----------------------------------------------------------'
+    print 'Information: '
+    print ' '
+    print 'Map size (X,Y): ', n, m
+    print 'Start: ', xA, yA
+    print 'Finish: ', xB, yB
+    t = time.time()
+    route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
+    print 'Time to generate the route (seconds): ', time.time() - t
+    print 'Route: ' + route
     
 
     # mark the route on the map
@@ -216,16 +225,6 @@ def main():
 
 
     wait = raw_input("Hit enter to start route: ")
-    print '-----------------------------------------------------------'
-    print 'Information: '
-    print ' '
-    print 'Map size (X,Y): ', n, m
-    print 'Start: ', xA, yA
-    print 'Finish: ', xB, yB
-    t = time.time()
-    route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
-    print 'Time to generate the route (seconds): ', time.time() - t
-    print 'Route: ' + route
     print '-----------------------------------------------------------'
     print 'Map:'
     print ' '
