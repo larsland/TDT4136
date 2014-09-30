@@ -219,29 +219,13 @@ def main():
                 print bcolors.FAIL + '#' + bcolors.ENDC, # obstacle
             elif xy == 2:
                 print bcolors.WARNING + 'A' + bcolors.ENDC, # start
-            elif xy == 4:
-                print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
-        print
-
-
-    wait = raw_input("Hit enter to start route: ")
-    print '-----------------------------------------------------------'
-    print 'Map:'
-    print ' '
-    for y in range(m):
-        for x in range(n):
-            xy = array[y][x]
-            if xy == 0:
-                print bcolors.OKBLUE + '.' + bcolors.ENDC, # space
-            elif xy == 1:
-                print bcolors.FAIL + '#' + bcolors.ENDC, # obstacle
-            elif xy == 2:
-                print bcolors.WARNING + 'A' + bcolors.ENDC, # start
             elif xy == 3:
                 print bcolors.OKGREEN + 'O' + bcolors.ENDC,  # route
             elif xy == 4:
                 print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
         print
+
+
 
 
 main()
