@@ -1,29 +1,10 @@
 
-def checkBoard():
-	board = open("boards/board-1-1.txt","r").read()
-	for line in board:
-		for char in line:
-			if char == '.':
-				print ("This node is walkable")
-			elif char == '#':
-				print("This node is a wall")
-			elif char == 'A':
-				print("This is where you start")
-			elif char == 'B':
-				print("This is your destination!")
-
-def main():
-	checkBoard()
-	
-main()
-
 # A* Shortest Path Algorithm
 # http://en.wikipedia.org/wiki/A*
 # FB - 201012256
 from heapq import heappush, heappop # for priority queue
 import math
 import time
-import random
 
 class node:
     xPos = 0 # x position
@@ -143,7 +124,7 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
     return '' # if no route found
 
 # MAIN
-dirs = 8 # number of possible directions to move on the map
+dirs = 4 # number of possible directions to move on the map
 if dirs == 4:
     dx = [1, 0, -1, 0]
     dy = [0, 1, 0, -1]
@@ -151,38 +132,53 @@ elif dirs == 8:
     dx = [1, 1, 0, -1, -1, -1, 0, 1]
     dy = [0, 1, 1, 1, 0, -1, -1, -1]
 
+y = 0
+x = 0
+xA = 0
+yA = 0
+xB = 0
+yB = 0
 
-n = 10 # horizontal size of the map
-m = 10 # vertical size of the map
-the_map = []
-row = [0] * n
-for i in range(m): # create empty map
-    the_map.append(list(row))
+array = []
 
-# fillout the map with a '+' pattern
-for x in range(n / 8, n * 7 / 8):
-    the_map[m / 2][x] = 1
-for y in range(m/8, m * 7 / 8):
-    the_map[y][n / 2] = 1
+print "test"
+board = open("boards/board-1-2.txt","r").readlines()
+for line in board:
+    x = 0
+    print line
+    preArray = []
+    for char in line:
+        if char == '.':
+            print ("This node is walkable")
+            preArray.append(0)
+        elif char == '#':
+            print("This node is a wall")
+            preArray.append(1)
+        elif char == 'A':
+            print("This is where you start")
+            xA = x
+            yA = y
+            preArray.append(0)
+        elif char == 'B':
+            print("This is your destination!")
+            xB = x
+            yB = y
+            preArray.append(0)
+        x += 1
+    y += 1
+    array.append(preArray)
 
-# randomly select start and finish locations from a list
-sf = []
-sf.append((0, 0, n - 1, m - 1))
-sf.append((0, m - 1, n - 1, 0))
-sf.append((n / 2 - 1, m / 2 - 1, n / 2 + 1, m / 2 + 1))
-sf.append((n / 2 - 1, m / 2 + 1, n / 2 + 1, m / 2 - 1))
-sf.append((n / 2 - 1, 0, n / 2 + 1, m - 1))
-sf.append((n / 2 + 1, m - 1, n / 2 - 1, 0))
-sf.append((0, m / 2 - 1, n - 1, m / 2 + 1))
-sf.append((n - 1, m / 2 + 1, 0, m / 2 - 1))
-(xA, yA, xB, yB) = random.choice(sf)
+
+n = x-1 # horizontal size of the map
+m = y # vertical size of the map
+
 
 print 'Map size (X,Y): ', n, m
 print 'Start: ', xA, yA
 print 'Finish: ', xB, yB
 t = time.time()
-print the_map
-route = pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB)
+print array
+route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
 print 'Time to generate the route (seconds): ', time.time() - t
 print 'Route:'
 print route
@@ -191,19 +187,19 @@ print route
 if len(route) > 0:
     x = xA
     y = yA
-    the_map[y][x] = 2
+    array[y][x] = 2
     for i in range(len(route)):
         j = int(route[i])
         x += dx[j]
         y += dy[j]
-        the_map[y][x] = 3
-    the_map[y][x] = 4
+        array[y][x] = 3
+    array[y][x] = 4
 
 # display the map with the route added
 print 'Map:'
 for y in range(m):
     for x in range(n):
-        xy = the_map[y][x]
+        xy = array[y][x]
         if xy == 0:
             print '.', # space
         elif xy == 1:
