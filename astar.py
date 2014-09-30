@@ -1,10 +1,7 @@
-
-# A* Shortest Path Algorithm
-# http://en.wikipedia.org/wiki/A*
-# FB - 201012256
 from heapq import heappush, heappop # for priority queue
 import math
 import time
+
 
 class node:
     xPos = 0 # x position
@@ -37,6 +34,14 @@ class node:
         # Chebyshev distance
         # d = max(abs(xd), abs(yd))
         return(d)
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
 
 # A-star algorithm.
 # The path returned will be a string of digits of directions.
@@ -123,93 +128,121 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
                     heappush(pq[pqi], m0) # add the better node instead
     return '' # if no route found
 
-# MAIN
-dirs = 4 # number of possible directions to move on the map
-if dirs == 4:
-    dx = [1, 0, -1, 0]
-    dy = [0, 1, 0, -1]
-elif dirs == 8:
-    dx = [1, 1, 0, -1, -1, -1, 0, 1]
-    dy = [0, 1, 1, 1, 0, -1, -1, -1]
 
-y = 0
-x = 0
-xA = 0
-yA = 0
-xB = 0
-yB = 0
 
-array = []
+def main():
+    dirs = 4 # number of possible directions to move on the map
+    if dirs == 4:
+        dx = [1, 0, -1, 0]
+        dy = [0, 1, 0, -1]
+    elif dirs == 8:
+        dx = [1, 1, 0, -1, -1, -1, 0, 1]
+        dy = [0, 1, 1, 1, 0, -1, -1, -1]
 
-print "test"
-board = open("boards/board-1-2.txt","r").readlines()
-for line in board:
+    y = 0
     x = 0
-    print line
-    preArray = []
-    for char in line:
-        if char == '.':
-            print ("This node is walkable")
-            preArray.append(0)
-        elif char == '#':
-            print("This node is a wall")
-            preArray.append(1)
-        elif char == 'A':
-            print("This is where you start")
-            xA = x
-            yA = y
-            preArray.append(0)
-        elif char == 'B':
-            print("This is your destination!")
-            xB = x
-            yB = y
-            preArray.append(0)
-        x += 1
-    y += 1
-    array.append(preArray)
+    xA = 0
+    yA = 0
+    xB = 0
+    yB = 0
+
+    array = []
+
+    map = raw_input("Choose a map between 1-4: ")
+    board = open(map+".txt","r").readlines()
+    for line in board:
+        x = 0
+        #print line
+        preArray = []
+        for char in line:
+            if char == '.':
+                #print ("This node is walkable")
+                preArray.append(0)
+            elif char == '#':
+                #print("This node is a wall")
+                preArray.append(1)
+            elif char == 'A':
+                #print("This is where you start")
+                xA = x
+                yA = y
+                preArray.append(0)
+            elif char == 'B':
+                #print("This is your destination!")
+                xB = x
+                yB = y
+                preArray.append(0)
+            x += 1
+        y += 1
+        array.append(preArray)
 
 
-n = x-1 # horizontal size of the map
-m = y # vertical size of the map
+    n = x-1 # horizontal size of the map
+    m = y # vertical size of the map
 
 
-print 'Map size (X,Y): ', n, m
-print 'Start: ', xA, yA
-print 'Finish: ', xB, yB
-t = time.time()
-print array
-route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
-print 'Time to generate the route (seconds): ', time.time() - t
-print 'Route:'
-print route
 
-# mark the route on the map
-if len(route) > 0:
-    x = xA
-    y = yA
-    array[y][x] = 2
-    for i in range(len(route)):
-        j = int(route[i])
-        x += dx[j]
-        y += dy[j]
-        array[y][x] = 3
-    array[y][x] = 4
+ 
+    
 
-# display the map with the route added
-print 'Map:'
-for y in range(m):
-    for x in range(n):
-        xy = array[y][x]
-        if xy == 0:
-            print '.', # space
-        elif xy == 1:
-            print 'O', # obstacle
-        elif xy == 2:
-            print 'S', # start
-        elif xy == 3:
-            print 'R', # route
-        elif xy == 4:
-            print 'F', # finish
-    print
+    # mark the route on the map
+    if len(route) > 0:
+        x = xA
+        y = yA
+        array[y][x] = 2
+        for i in range(len(route)):
+            j = int(route[i])
+            x += dx[j]
+            y += dy[j]
+            array[y][x] = 3
+        array[y][x] = 4
 
-raw_input('Press Enter...')
+    
+    #Displays the map, with the route added
+    print '-----------------------------------------------------------'
+    print 'Map:'
+    print ' '
+    for y in range(m):
+        for x in range(n):
+            xy = array[y][x]
+            if xy == 0:
+                print bcolors.OKBLUE + '.' + bcolors.ENDC, # space
+            elif xy == 1:
+                print bcolors.FAIL + '#' + bcolors.ENDC, # obstacle
+            elif xy == 2:
+                print bcolors.WARNING + 'A' + bcolors.ENDC, # start
+            elif xy == 4:
+                print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
+        print
+
+
+    wait = raw_input("Hit enter to start route: ")
+    print '-----------------------------------------------------------'
+    print 'Information: '
+    print ' '
+    print 'Map size (X,Y): ', n, m
+    print 'Start: ', xA, yA
+    print 'Finish: ', xB, yB
+    t = time.time()
+    route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
+    print 'Time to generate the route (seconds): ', time.time() - t
+    print 'Route: ' + route
+    print '-----------------------------------------------------------'
+    print 'Map:'
+    print ' '
+    for y in range(m):
+        for x in range(n):
+            xy = array[y][x]
+            if xy == 0:
+                print bcolors.OKBLUE + '.' + bcolors.ENDC, # space
+            elif xy == 1:
+                print bcolors.FAIL + '#' + bcolors.ENDC, # obstacle
+            elif xy == 2:
+                print bcolors.WARNING + 'A' + bcolors.ENDC, # start
+            elif xy == 3:
+                print bcolors.OKGREEN + 'O' + bcolors.ENDC,  # route
+            elif xy == 4:
+                print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
+        print
+
+
+main()
