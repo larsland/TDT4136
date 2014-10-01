@@ -45,14 +45,15 @@ class bcolors:
 
 # A-star algorithm.
 # The path returned will be a string of digits of directions.
-def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
-    closed_nodes_map = [] # map of closed (tried-out) nodes
-    open_nodes_map = [] # map of open (not-yet-tried) nodes
+def pathFind(the_map, n, m, dx, dy, xA, yA, xB, yB):
+    closed_nodes = [] # map of closed (tried-out) nodes
+    open_nodes = [] # map of open (not-yet-tried) nodes
     dir_map = [] # map of dirs
     row = [0] * n
+    dirs = 4
     for i in range(m): # create 2d arrays
-        closed_nodes_map.append(list(row))
-        open_nodes_map.append(list(row))
+        closed_nodes.append(list(row))
+        open_nodes.append(list(row))
         dir_map.append(list(row))
 
     pq = [[], []] # priority queues of open (not-yet-tried) nodes
@@ -61,7 +62,7 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
     n0 = node(xA, yA, 0, 0)
     n0.updatePriority(xB, yB)
     heappush(pq[pqi], n0)
-    open_nodes_map[yA][xA] = n0.priority # mark it on the open nodes map
+    open_nodes[yA][xA] = n0.priority # mark it on the open nodes map
 
     # A* search
     while len(pq[pqi]) > 0:
@@ -72,8 +73,8 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
         x = n0.xPos
         y = n0.yPos
         heappop(pq[pqi]) # remove the node from the open list
-        open_nodes_map[y][x] = 0
-        closed_nodes_map[y][x] = 1 # mark it on the closed nodes map
+        open_nodes[y][x] = 0
+        closed_nodes[y][x] = 1 # mark it on the closed nodes map
 
         # quit searching when the goal is reached
         # if n0.estimate(xB, yB) == 0:
@@ -94,22 +95,22 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
             xdx = x + dx[i]
             ydy = y + dy[i]
             if not (xdx < 0 or xdx > n-1 or ydy < 0 or ydy > m - 1
-                    or the_map[ydy][xdx] == 1 or closed_nodes_map[ydy][xdx] == 1):
+                    or the_map[ydy][xdx] == 1 or closed_nodes[ydy][xdx] == 1):
                 # generate a child node
                 m0 = node(xdx, ydy, n0.distance, n0.priority)
-                m0.nextMove(dirs, i)
+                m0.nextMove(4, i)
                 m0.updatePriority(xB, yB)
                 # if it is not in the open list then add into that
-                if open_nodes_map[ydy][xdx] == 0:
-                    open_nodes_map[ydy][xdx] = m0.priority
+                if open_nodes[ydy][xdx] == 0:
+                    open_nodes[ydy][xdx] = m0.priority
                     heappush(pq[pqi], m0)
                     # mark its parent node direction
-                    dir_map[ydy][xdx] = (i + dirs / 2) % dirs
-                elif open_nodes_map[ydy][xdx] > m0.priority:
+                    dir_map[ydy][xdx] = (i + 2) % 4
+                elif open_nodes[ydy][xdx] > m0.priority:
                     # update the priority
-                    open_nodes_map[ydy][xdx] = m0.priority
+                    open_nodes[ydy][xdx] = m0.priority
                     # update the parent direction
-                    dir_map[ydy][xdx] = (i + dirs / 2) % dirs
+                    dir_map[ydy][xdx] = (i + 2) % 4
                     # replace the node
                     # by emptying one pq to the other one
                     # except the node to be replaced will be ignored
@@ -132,12 +133,9 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
 
 def main():
     dirs = 4 # number of possible directions to move on the map
-    if dirs == 4:
-        dx = [1, 0, -1, 0]
-        dy = [0, 1, 0, -1]
-    elif dirs == 8:
-        dx = [1, 1, 0, -1, -1, -1, 0, 1]
-        dy = [0, 1, 1, 1, 0, -1, -1, -1]
+    dx = [1, 0, -1, 0]
+    dy = [0, 1, 0, -1]
+
 
     y = 0
     x = 0
@@ -188,7 +186,7 @@ def main():
     print 'Start: ', xA, yA
     print 'Finish: ', xB, yB
     t = time.time()
-    route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
+    route = pathFind(array, n, m, dx, dy, xA, yA, xB, yB)
     print 'Time to generate the route (seconds): ', time.time() - t
     print 'Route: ' + route
     
