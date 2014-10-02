@@ -2,24 +2,29 @@ from heapq import heappush, heappop # for priority queue
 import math
 import time
 
-
+#Class to represent a node
 class node:
     xPos = 0 # x position
     yPos = 0 # y position
     cost = 0 # total distance already travelled to reach the node
     priority = 0 # priority = distance + remaining distance estimate
+
     def __init__(self, xPos, yPos, cost, priority):
         self.xPos = xPos
         self.yPos = yPos
         self.cost = cost
         self.priority = priority
+
     def __lt__(self, other): # comparison method for priority queue
         return self.priority < other.priority
+
     def updatePriority(self, xDest, yDest):
         self.priority = self.cost + self.estimate(xDest, yDest) * 10 # A*
+
     # give higher priority to going straight instead of diagonally
     def nextMove(self, dirs, d): # d: direction to move
             self.cost += 10
+
     # Estimation function for the remaining distance to the goal.
     def estimate(self, xDest, yDest):
         xd = xDest - self.xPos
@@ -27,6 +32,7 @@ class node:
         d = math.sqrt(xd * xd + yd * yd)
         return(d)
 
+#Class holding colors used in console printing
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -42,6 +48,7 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
     open_nodes_map = [] # map of open (not-yet-tried) nodes
     dir_map = [] # map of dirs
     row = [0] * n
+    
     for i in range(m): # create 2d arrays
         closed_nodes_map.append(list(row))
         open_nodes_map.append(list(row))
@@ -49,6 +56,7 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
 
     pq = [[], []] # priority queues of open (not-yet-tried) nodes
     pqi = 0 # priority queue index
+    
     # create the start node and push into list of open nodes
     n0 = node(xA, yA, 0, 0)
     n0.updatePriority(xB, yB)
@@ -124,13 +132,8 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
 
 def main():
     dirs = 4 # number of possible directions to move on the map
-    if dirs == 4:
-        dx = [1, 0, -1, 0]
-        dy = [0, 1, 0, -1]
-    elif dirs == 8:
-        dx = [1, 1, 0, -1, -1, -1, 0, 1]
-        dy = [0, 1, 1, 1, 0, -1, -1, -1]
-
+    dx = [1, 0, -1, 0]
+    dy = [0, 1, 0, -1]
     y = 0
     x = 0
     xA = 0
@@ -140,26 +143,23 @@ def main():
 
     array = []
 
+    #Choose a board as input, from user input
     map = raw_input("Choose a map between 1-4: ")
     board = open(map+".txt","r").readlines()
+
     for line in board:
         x = 0
-        #print line
         preArray = []
         for char in line:
             if char == '.':
-                #print ("This node is walkable")
                 preArray.append(0)
             elif char == '#':
-                #print("This node is a wall")
                 preArray.append(1)
             elif char == 'A':
-                #print("This is where you start")
                 xA = x
                 yA = y
                 preArray.append(0)
             elif char == 'B':
-                #print("This is your destination!")
                 xB = x
                 yB = y
                 preArray.append(0)
@@ -168,23 +168,13 @@ def main():
         array.append(preArray)
 
 
-    n = x-1 # horizontal size of the map
-    m = y # vertical size of the map
+ 
 
-
-
-    print '-----------------------------------------------------------'
-    print 'Information: '
-    print ' '
-    print 'Map size (X,Y): ', n, m
-    print 'Start: ', xA, yA
-    print 'Finish: ', xB, yB
+  
     t = time.time()
     route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
-    print 'Time to generate the route (seconds): ', time.time() - t
-    print 'Route: ' + route
+   
     
-
     # mark the route on the map
     if len(route) > 0:
         x = xA
@@ -197,26 +187,6 @@ def main():
             array[y][x] = 3
         array[y][x] = 4
 
-    
-    #Displays the map, with the route added
-    print '-----------------------------------------------------------'
-    print 'Map:'
-    print ' '
-    for y in range(m):
-        for x in range(n):
-            xy = array[y][x]
-            if xy == 0:
-                print bcolors.OKBLUE + '.' + bcolors.ENDC, # space
-            elif xy == 1:
-                print bcolors.FAIL + '#' + bcolors.ENDC, # obstacle
-            elif xy == 2:
-                print bcolors.WARNING + 'A' + bcolors.ENDC, # start
-            elif xy == 4:
-                print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
-        print
-
-
-    wait = raw_input("Hit enter to start route: ")
     print '-----------------------------------------------------------'
     print 'Map:'
     print ' '
@@ -233,7 +203,7 @@ def main():
                 print bcolors.OKGREEN + 'O' + bcolors.ENDC,  # route
             elif xy == 4:
                 print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
-        print
+        
 
 
 main()
