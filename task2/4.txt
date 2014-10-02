@@ -1,10 +1,7 @@
-wwwwwggggggggggggggggggggggggggggggrrrrr
-wwwwwwwgggggggggggggggggggggwwwwwgrrgggg
-wwwwwwwwwwwgggAgggggggwwwwwwwwwwwwrwgggg
-wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwrwwwww
-wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwrwwwww
-wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwrrwwwww
-wwwwwwwwgggggBgggggwwwwwwwwwwwwwwrwwwwww
-wwwwggggggffffffgggggggggwwwwwwwwrwwwwww
-wwggggffffffffffffffggggggggggggrrgwwwww
-wgggfffrrrrrrrrrrrrrrrrrrrrrrrrrrggggggg
+A.#.......#......#..
+#.#.#####.#.####.#..
+..#.....#.#....#....
+.##.###.######.#####
+..#.B#..#....#...#..
+#.####.##.##.#.#.##.
+...........#...#....

@@ -1,6 +1,8 @@
 from heapq import heappush, heappop # for priority queue
 import math
 import time
+import Queue
+from Tkinter import *
 
 
 class node:
@@ -8,18 +10,26 @@ class node:
     yPos = 0 # y position
     cost = 0 # total distance already travelled to reach the node
     priority = 0 # priority = distance + remaining distance estimate
-    def __init__(self, xPos, yPos, cost, priority,the_map):
+    algorithm = 0
+
+    def __init__(self, xPos, yPos, cost, priority,the_map, algorithm):
         self.xPos = xPos
         self.yPos = yPos
-        self.cost = cost
         self.priority = priority
-        self.nextMove(the_map,0)
+        self.cost += cost
+        self.getCost(the_map)
+        self.algorithm = algorithm
+
     def __lt__(self, other): # comparison method for priority queue
         return self.priority < other.priority
+
     def updatePriority(self, xDest, yDest):
-        self.priority = self.cost + self.estimate(xDest, yDest) * 10 # A*
-    # give higher priority to going straight instead of diagonally
-    def nextMove(self, the_map, d): # d: direction to move
+        if self.algorithm == '0' or self.algorithm == '1':
+            self.priority = self.cost + self.hFunction(xDest, yDest) # A*
+        if self.algorithm == '2':
+            self.priority = self.cost
+
+    def getCost(self, the_map):
         next_node_type = the_map[self.yPos][self.xPos]
         if next_node_type == "w":
             self.cost += 100
@@ -31,10 +41,11 @@ class node:
             self.cost += 5
         elif next_node_type == "r":
             self.cost += 1
+        elif next_node_type == "#":
+            self.cost += 10000
 
-
-    # Estimation function for the remaining distance to the goal.
-    def estimate(self, xDest, yDest):
+    # Estimate remaining distance to the goal.
+    def hFunction(self, xDest, yDest):
         xd = xDest - self.xPos
         yd = yDest - self.yPos
         d = abs(xd) + abs(yd)
@@ -51,9 +62,10 @@ class bcolors:
     RED = '\x1b[31;1m'
     GREEN = '\x1b[36;1m'
 
+
 # A-star algorithm.
 # The path returned will be a string of digits of directions.
-def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
+def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB, algorithm):
     closed_nodes_map = [] # map of closed (tried-out) nodes
     open_nodes_map = [] # map of open (not-yet-tried) nodes
     dir_map = [] # map of dirs
@@ -66,7 +78,7 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
     pq = [[], []] # priority queues of open (not-yet-tried) nodes
     pqi = 0 # priority queue index
     # create the start node and push into list of open nodes
-    n0 = node(xA, yA, 0, 0,the_map)
+    n0 = node(xA, yA, 0, 0,the_map, algorithm)
     n0.updatePriority(xB, yB)
     heappush(pq[pqi], n0)
     open_nodes_map[yA][xA] = n0.priority # mark it on the open nodes map
@@ -76,35 +88,31 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
         # get the current node w/ the highest priority
         # from the list of open nodes
         n1 = pq[pqi][0] # top node
-        n0 = node(n1.xPos, n1.yPos, n1.cost, n1.priority,the_map)
+        n0 = node(n1.xPos, n1.yPos, n1.cost, n1.priority,the_map,algorithm)
         x = n0.xPos
         y = n0.yPos
         heappop(pq[pqi]) # remove the node from the open list
         open_nodes_map[y][x] = 0
         closed_nodes_map[y][x] = 1 # mark it on the closed nodes map
 
-        # quit searching when the goal is reached
-        # if n0.estimate(xB, yB) == 0:
+        # stop searching if we have reached the goal and generate the path
         if x == xB and y == yB:
-            # generate the path from finish to start
-            # by following the dirs
             path = ''
             while not (x == xA and y == yA):
                 j = dir_map[y][x]
-                c = str((j + dirs / 2) % dirs)
+                c = str((j + 2) % 4)
                 path = c + path
                 x += dx[j]
                 y += dy[j]
-            return path
+            return path, closed_nodes_map, open_nodes_map
 
         # generate moves (child nodes) in all possible dirs
-        for i in range(dirs):
+        for i in range(4):
             xdx = x + dx[i]
             ydy = y + dy[i]
             if not (xdx < 0 or xdx > n-1 or ydy < 0 or ydy > m - 1 or closed_nodes_map[ydy][xdx] == 1):
                 # generate a child node
-                m0 = node(xdx, ydy, n0.cost, n0.priority,the_map)
-                m0.nextMove(the_map, i)
+                m0 = node(xdx, ydy, n0.cost, n0.priority,the_map, algorithm)
                 m0.updatePriority(xB, yB)
                 # if it is not in the open list then add into that
                 if open_nodes_map[ydy][xdx] == 0:
@@ -137,14 +145,20 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
 
 
 
+def chooseAlgo():
+    algorithm = raw_input("Choose an algorithm: 0: AStar, 1: BFS, 2: Dijkstra: ")
+
+    if algorithm == '0' or algorithm == '1' or algorithm == '2':
+        return algorithm
+    else:
+        print "Wrong input, try again"
+        chooseAlgo()
+
 def main():
+    algorithm = chooseAlgo()
     dirs = 4 # number of possible directions to move on the map
-    if dirs == 4:
-        dx = [1, 0, -1, 0]
-        dy = [0, 1, 0, -1]
-    elif dirs == 8:
-        dx = [1, 1, 0, -1, -1, -1, 0, 1]
-        dy = [0, 1, 1, 1, 0, -1, -1, -1]
+    dx = [1, 0, -1, 0]
+    dy = [0, 1, 0, -1]
 
     y = 0
     x = 0
@@ -155,11 +169,12 @@ def main():
 
     array = []
 
-    map = raw_input("Choose a map between 1-4: ")
+    #allows user to choose what map to use and adds the board to a array
+
+    map = raw_input("Choose a map between 1-4, or 21-24: ")
     board = open(map+".txt","r").readlines()
     for line in board:
         x = 0
-        print line
         preArray = []
         for char in line:
             if char == 'A':
@@ -170,6 +185,8 @@ def main():
                 xB = x
                 yB = y
                 preArray.append('B')
+            elif char == '.':
+                preArray.append('r')
             elif char != '\n':
                 preArray.append(char)
             x += 1
@@ -180,9 +197,6 @@ def main():
     n = x-1 # horizontal size of the map
     m = y # vertical size of the map
 
-    print array
-
-
     print '-----------------------------------------------------------'
     print 'Information: '
     print ' '
@@ -190,7 +204,12 @@ def main():
     print 'Start: ', xA, yA
     print 'Finish: ', xB, yB
     t = time.time()
-    route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
+    if algorithm == '1':
+        bfspathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB,algorithm)
+    else:
+        route, closed_nodes, open_nodes = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB,algorithm)
+    print closed_nodes
+    print open_nodes
     print 'Time to generate the route (seconds): ', time.time() - t
     print 'Route: ' + route
     
@@ -207,6 +226,7 @@ def main():
             array[y][x] = array[y][x].upper()
         array[y][x] = 4
 
+    #The visualization of the map
     print '-----------------------------------------------------------'
     print 'Map:'
     print ' '
@@ -220,15 +240,40 @@ def main():
             elif xy == 4:
                 print bcolors.RED + 'B' + bcolors.ENDC,
             elif xy == 'm':
-                print bcolors.OKGREY + xy + bcolors.ENDC,
+                if closed_nodes[y][x] == 1:
+                    print bcolors.OKGREY + 'x' + bcolors.ENDC,
+                elif open_nodes[y][x] != 0:
+                    print bcolors.OKGREY + '*' + bcolors.ENDC,
+                else:
+                    print bcolors.OKGREY + xy + bcolors.ENDC,
             elif xy == 'w':
-                print bcolors.OKBLUE + xy + bcolors.ENDC,
+                if closed_nodes[y][x] == 1:
+                    print bcolors.OKBLUE + 'x' + bcolors.ENDC,
+                elif open_nodes[y][x] != 0:
+                    print bcolors.OKBLUE + '*' + bcolors.ENDC,
+                else:
+                     print bcolors.OKBLUE + xy + bcolors.ENDC,
             elif xy == 'r':
-                print bcolors.WARNING + xy + bcolors.ENDC,
+                if closed_nodes[y][x] == 1:
+                    print bcolors.WARNING + 'x' + bcolors.ENDC,
+                elif open_nodes[y][x] != 0:
+                    print bcolors.WARNING + '*' + bcolors.ENDC,
+                else:
+                    print bcolors.WARNING + xy + bcolors.ENDC,
             elif xy == 'g':
-                print bcolors.OKGREEN + xy + bcolors.ENDC,
+                if closed_nodes[y][x] == 1:
+                    print bcolors.OKGREEN + 'x' + bcolors.ENDC,
+                elif open_nodes[y][x] != 0:
+                    print bcolors.OKGREEN + '*' + bcolors.ENDC,
+                else:
+                    print bcolors.OKGREEN + xy + bcolors.ENDC,
             elif xy == 'f':
-                print bcolors.GREEN + xy + bcolors.ENDC,
+                if closed_nodes[y][x] == 1:
+                    print bcolors.GREEN + 'x' + bcolors.ENDC,
+                elif open_nodes[y][x] != 0:
+                    print bcolors.GREEN + '*' + bcolors.ENDC,
+                else:
+                    print bcolors.GREEN + xy + bcolors.ENDC,
             else:
                 print bcolors.WARNING + xy + bcolors.ENDC, # finish
 
