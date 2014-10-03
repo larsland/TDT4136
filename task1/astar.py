@@ -21,25 +21,12 @@ class node:
     def updatePriority(self, xDest, yDest):
         self.priority = self.cost + self.estimate(xDest, yDest) * 10 # A*
 
-    # give higher priority to going straight instead of diagonally
-    def nextMove(self, dirs, d): # d: direction to move
-            self.cost += 10
-
     # Estimation function for the remaining distance to the goal.
     def estimate(self, xDest, yDest):
         xd = xDest - self.xPos
         yd = yDest - self.yPos
         d = math.sqrt(xd * xd + yd * yd)
         return(d)
-
-#Class holding colors used in console printing
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
 
 # A-star algorithm.
 # The path returned will be a string of digits of directions.
@@ -97,7 +84,6 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB):
                     or the_map[ydy][xdx] == 1 or closed_nodes_map[ydy][xdx] == 1):
                 # generate a child node
                 m0 = node(xdx, ydy, n0.cost, n0.priority)
-                m0.nextMove(dirs, i)
                 m0.updatePriority(xB, yB)
                 # if it is not in the open list then add into that
                 if open_nodes_map[ydy][xdx] == 0:
@@ -168,13 +154,12 @@ def main():
         array.append(preArray)
 
 
- 
+    n = x-1 # horizontal size of the map
+    m = y # vertical size of the map
 
-  
     t = time.time()
     route = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB)
-   
-    
+
     # mark the route on the map
     if len(route) > 0:
         x = xA
@@ -186,6 +171,7 @@ def main():
             y += dy[j]
             array[y][x] = 3
         array[y][x] = 4
+
 
     print '-----------------------------------------------------------'
     print 'Map:'
@@ -203,6 +189,18 @@ def main():
                 print bcolors.OKGREEN + 'O' + bcolors.ENDC,  # route
             elif xy == 4:
                 print bcolors.WARNING + 'B' + bcolors.ENDC, # finish
+        print
+
+
+
+#Class holding colors used in console printing
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
         
 
 
