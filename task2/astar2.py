@@ -10,7 +10,7 @@ class node:
     yPos = 0 # y position
     cost = 0 # total distance already travelled to reach the node
     priority = 0 # priority = distance + remaining distance estimate
-    algorithm = 0
+    algorithm = 0 #specify what algorithm is in use
 
     def __init__(self, xPos, yPos, cost, priority,the_map, algorithm):
         self.xPos = xPos
@@ -29,6 +29,7 @@ class node:
         if self.algorithm == '2':
             self.priority = self.cost
 
+    #set the cost of the node
     def getCost(self, the_map):
         next_node_type = the_map[self.yPos][self.xPos]
         if next_node_type == "w":
@@ -42,7 +43,7 @@ class node:
         elif next_node_type == "r":
             self.cost += 1
         elif next_node_type == "#":
-            self.cost += 100000
+            self.cost += 10000
 
     # Estimate remaining distance to the goal.
     def hFunction(self, xDest, yDest):
@@ -51,16 +52,7 @@ class node:
         d = abs(xd) + abs(yd)
         return(d)
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    OKGREY= '\x1b[30m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    RED = '\x1b[31;1m'
-    GREEN = '\x1b[36;1m'
+
 
 
 # A-star algorithm.
@@ -221,22 +213,19 @@ def chooseAlgo():
         chooseAlgo()
 
 def main():
-    algorithm = chooseAlgo()
     dirs = 4 # number of possible directions to move on the map
     dx = [1, 0, -1, 0]
     dy = [0, 1, 0, -1]
 
-    y = 0
-    x = 0
+    x, y = 0, 0
     xA = 0
     yA = 0
     xB = 0
     yB = 0
-
     array = []
 
     #allows user to choose what map to use and adds the board to a array
-
+    algorithm = chooseAlgo()
     map = raw_input("Choose a map between 1-4, or 21-24: ")
     board = open(map+".txt","r").readlines()
     for line in board:
@@ -334,6 +323,19 @@ def main():
                 print bcolors.WARNING + xy + bcolors.ENDC, # finish
 
         print
+
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    OKGREY= '\x1b[30m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    RED = '\x1b[31;1m'
+    GREEN = '\x1b[36;1m'
 
 
 main()
