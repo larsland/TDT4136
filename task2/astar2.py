@@ -203,18 +203,6 @@ def bfsPathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB, algorithm):
                     open_nodes_map[ydy][xdx] = m0.priority
                     # update the parent direction
                     dir_map[ydy][xdx] = (i + dirs / 2) % dirs
-
-                    #while not (q[0].xPos == xdx and q[0].yPos == ydy):
-                    #    q.append(q[0])
-                    #    q.pop(q[qi])
-                    #q.pop() 
-                   
-                    #empty the larger size priority queue to the smaller one
-                    #if len(pq[pqi]) > len(pq[1 - pqi]):
-                    #    pqi = 1 - pqi
-                    #while q:
-                    #    q.append(q[qi])
-                    #    q.pop(0)
                     qi = 1 - qi
                     q.append(m0)
                     
