@@ -16,9 +16,13 @@ class node:
         self.xPos = xPos
         self.yPos = yPos
         self.priority = priority
-        self.cost += cost
-        self.getCost(the_map)
+        if algorithm == '1':
+            self.cost += 0
+        else:
+            self.cost += cost
+            self.getCost(the_map)
         self.algorithm = algorithm
+        print self.algorithm
 
     def __lt__(self, other): # comparison method for priority queue
         return self.priority < other.priority
@@ -31,7 +35,9 @@ class node:
 
     def getCost(self, the_map):
         next_node_type = the_map[self.yPos][self.xPos]
-        if next_node_type == "w":
+        if self.algorithm == '1':
+            self.cost += 1
+        elif next_node_type == "w":
             self.cost += 100
         elif next_node_type == "m":
             self.cost += 50
@@ -66,6 +72,7 @@ class bcolors:
 # A-star algorithm.
 # The path returned will be a string of digits of directions.
 def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB, algorithm):
+    print algorithm
     closed_nodes_map = [] # map of closed (tried-out) nodes
     open_nodes_map = [] # map of open (not-yet-tried) nodes
     dir_map = [] # map of dirs
@@ -110,7 +117,7 @@ def pathFind(the_map, n, m, dirs, dx, dy, xA, yA, xB, yB, algorithm):
         for i in range(4):
             xdx = x + dx[i]
             ydy = y + dy[i]
-            if not (xdx < 0 or xdx > n-1 or ydy < 0 or ydy > m - 1 or closed_nodes_map[ydy][xdx] == 1):
+            if not (xdx < 0 or xdx > n-1 or ydy < 0 or ydy > m - 1 or closed_nodes_map[ydy][xdx] == 1 or the_map[ydy][xdx] == '#'):
                 # generate a child node
                 m0 = node(xdx, ydy, n0.cost, n0.priority,the_map, algorithm)
                 m0.updatePriority(xB, yB)
@@ -155,7 +162,6 @@ def chooseAlgo():
         chooseAlgo()
 
 def main():
-    algorithm = chooseAlgo()
     dirs = 4 # number of possible directions to move on the map
     dx = [1, 0, -1, 0]
     dy = [0, 1, 0, -1]
@@ -170,7 +176,8 @@ def main():
     array = []
 
     #allows user to choose what map to use and adds the board to a array
-
+    algorithm = chooseAlgo()
+    print algorithm
     map = raw_input("Choose a map between 1-4, or 21-24: ")
     board = open(map+".txt","r").readlines()
     for line in board:
@@ -187,6 +194,8 @@ def main():
                 preArray.append('B')
             elif char == '.':
                 preArray.append('r')
+            elif char == '#':
+                preArray.append('#')
             elif char != '\n':
                 preArray.append(char)
             x += 1
@@ -204,10 +213,8 @@ def main():
     print 'Start: ', xA, yA
     print 'Finish: ', xB, yB
     t = time.time()
-    if algorithm == '1':
-        bfspathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB,algorithm)
-    else:
-        route, closed_nodes, open_nodes = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB,algorithm)
+    print algorithm
+    route, closed_nodes, open_nodes = pathFind(array, n, m, dirs, dx, dy, xA, yA, xB, yB,algorithm)
     print closed_nodes
     print open_nodes
     print 'Time to generate the route (seconds): ', time.time() - t
